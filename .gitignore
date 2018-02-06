@@ -79,10 +79,8 @@ $RECYCLE.BIN/
 *.lnk
 
 
-# Js files
-*.js
+# Js map files
 *.js.map
 
-# app_setting that may contain sensitive information
 api/helpers/app-settings.ts
-.vscode
+.vscode/temp.sql
