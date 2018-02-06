@@ -1,0 +1,462 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: Gateway Service
+# during dev, should point to your local machine
+host: localhost:10020
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+
+securityDefinitions:
+#  oauth2_google: 
+#    type: oauth2
+#    scopes:
+#      read:strategies: 'Read access to stewards'
+#    flow: accessCode
+#    authorizationUrl: http://127.0.0.1:10020/auth/google
+#    x-authroization-operation-id: authenticateWithGoogle
+#    tokenUrl: http://127.0.0.1:10020/auth/google/callback
+#    x-token-operation-id: authenticationCallBackWithGoogle
+  jwt:
+    type: apiKey
+    in: header
+    name: JWT-TOKEN
+  api_key:
+    type: apiKey
+    in: header
+    name: api-key
+paths:
+  /strategies:
+    x-swagger-router-controller: strategy.controller
+    get:
+      tags: 
+        - strategy
+      security:
+        - jwt: []
+        - api_key: []
+      description: Returns a list of available strategies
+      produces:
+        - application/json
+      operationId: getStrategies
+      parameters: 
+        - name: _id
+          in: query
+          description: The id of a specific strategy
+          required: false
+          type: string
+      responses:
+        "200":
+          description: A list of strategies
+          schema: 
+            type: array
+            items:
+              $ref: "#/definitions/StrategyQuery"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      tags: 
+        - strategy
+      security:
+        - jwt: []
+      description: adds a new strategy
+      produces:
+        - application/json
+      operationId: postStrategies
+      parameters:
+        - name: strategy
+          description: the complete strategy object
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Strategy"
+      responses:
+        200:
+          description: OK - created successfully
+          schema: 
+            $ref: "#/definitions/Strategy"
+  /strategies/backtest:
+    x-swagger-router-controller: strategy.controller
+    patch:
+      tags: 
+        - strategy
+      security:
+        - api_key: []
+        - jwt: []
+      description: starts backtesting a strategy
+      operationId: backtest
+      parameters:
+        - name: instrument
+          description: the instrument in which the stratgey is backtested
+          in: query
+          required: true
+          type: string
+          enum: 
+            - AUD_USD
+        - name: strategy
+          description: the strategy to be backtested
+          type: string
+          in: query
+          required: true
+        - name: payload
+          description: the payload which contains a description for the backtest
+          in: body
+          schema:
+            type: object
+            properties:
+              description:
+                type: string
+                description: a description for the backtest
+                example: testing with RSA added to the strategy
+              
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/EventResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /instruments:
+    x-swagger-router-controller: instrument.controller
+    get:
+      tags: 
+        - instrument
+      description: Returns a list of instruments
+      produces:
+        - application/json
+      operationId: getInstruments
+      parameters: 
+        - name: title
+          in: query
+          description: The title of a specific instrument
+          required: false
+          type: string
+      responses:
+        "200":
+          description: A list of instruments
+          schema: 
+            type: array
+            items:
+              $ref: "#/definitions/Instrument"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /tradersm5:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: trader-m5.controller
+    post:
+      tags: 
+        - trader-m5
+      security:
+        - jwt: []
+        - api_key: []
+      description: adds a new trader-m5 for a user using the strategy passed
+      operationId: create
+      parameters:
+        - name: payload
+          description: the required input for the event to create
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/TraderEventPayload"
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/EventResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      tags: 
+        - trader-m5
+      security:
+        - jwt: []
+        - api_key: []
+      description: gets all trader-m5 for a user
+      operationId: get
+      parameters:
+        - name: _id
+          description: the optional trader id
+          in: query
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/TraderQuery"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /hello:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: hello_world
+    get:
+      security:
+        - jwt: []
+      description: Returns 'Hello' to the caller
+      # used as the method name of the controller
+      operationId: hello
+      parameters:
+        - name: name
+          in: query
+          description: The name of the person to whom to say hello
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/HelloWorldResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: user.controller
+    get:
+      tags: 
+        - user
+      security:
+        - api_key: []
+        - jwt: []
+      description: Returns the current authenticated user to the caller
+      # used as the method name of the controller
+      produces:
+        - application/json
+      operationId: getUser
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/User"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  Instrument:
+    type: object
+    required:
+      - _id
+      - displayName
+      - halted
+      - title
+      - path
+      - marginRate
+      - maxTradeUnits
+      - maxTrailingStop
+      - minTrailingStop
+      - pip
+      - precision
+      - granularities
+    properties:
+      _id:
+        type: string
+      displayName:
+        type: string
+      halted:
+        type: boolean
+      title:
+        type: string
+        enum:
+          - AUD_USD
+      path:
+        type: string
+      marginRate:
+        type: number
+      maxTradeUnits:
+        type: number
+      maxTrailingStop:
+        type: number
+      minTrailingStop:
+        type: number
+      pip:
+        type: string
+      precision:
+        type: string
+      granularities:
+        type: array
+        items:
+          type: string
+  Candle:
+    type: object
+    properties:
+      closeAsk:
+        type: number
+      closeBid:
+        type: number
+      complete:
+        type: boolean
+      highAsk:
+        type: number
+      highBid:
+        type: number
+      lowAsk:
+        type: number
+      lowBid:
+        type: number
+      openAsk:
+        type: number
+      openBid:
+        type: number
+      time:
+        type: string
+      volume:
+        type: number     
+  Strategy:
+ #   discriminator: strategyType
+    type: object
+    required:
+      - _id
+      - name
+      - description
+      - createdTime
+      - isActive
+      - granularity
+      - postedBy
+   #   - strategyType # for inheritance
+    properties:
+      _id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      createdTime:
+        type: string
+        format: date-time
+      isActive:
+        type: boolean
+      granularity:
+        type: string
+        enum:
+          - M5
+          - M15
+          - M30
+          - H1
+          - H4
+          - D1
+      postedBy:
+        type: string
+    #  strategyType:
+    #    type: string
+  StrategyQuery:
+    allOf:
+      - $ref: "#/definitions/Strategy"
+      - properties:
+          postedBy_displayName:
+            type: string
+  User:
+    type: object
+    properties:
+      _id:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      displayName:
+        type: string
+      userName:
+        type: string
+      updated:
+        type: string
+        format: date-time
+      created:
+        type: string
+        format: date-time
+  TraderQuery:
+    type: object
+    properties:
+      created: 
+        type: string
+        format: date-time
+        description: the date time the trader created
+      updated: 
+        type: string
+        format: date-time
+        description: last time the trader updated 
+      status: 
+        type: string
+        enum:
+          - Created
+          - In
+          - Out
+        description: the last status of the trader
+      version: 
+        type: number
+        description: the version number of the trader
+      instrument: 
+        type: string
+        description: the instrument that the trader is using
+      _id: 
+        type: string
+        description: the id of the trader
+      userId: 
+        type: string
+        description: the owner of the trader
+  TraderEventPayload:
+    type: object
+    required:
+      - userId
+      - strategyId
+      - instrument
+    properties:
+      strategyId:
+        type: string
+        description: the trader's strategy
+        default: 5788751b5ff4760ceb704ec1
+      userId:
+        type: string
+        description: the owner of the trader
+        default: 57b16c90b285f00a0c301318
+      instrument:
+        type: string
+  EventResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  HelloWorldResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  ErrorResponse:
+    properties:
+      message:
+        type: string
+    required:
+      - message
