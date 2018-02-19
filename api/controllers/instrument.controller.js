@@ -16,9 +16,9 @@ function getInstruments(req, res, next) {
         if (req.swagger.params && req.swagger.params.title) {
             title = req.swagger.params.title.value;
         }
-        let instrumentProxy = new api.proxies.InstrumentProxyService();
+        const instrumentProxy = new api.proxies.InstrumentProxyService();
         try {
-            let result = yield instrumentProxy.getInstruments(title);
+            const result = yield instrumentProxy.getInstruments(title);
             res.json(result.body);
         }
         catch (err) {

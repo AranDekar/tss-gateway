@@ -7,9 +7,9 @@ export async function getInstruments(req, res, next) {
         title = req.swagger.params.title.value;
     }
 
-    let instrumentProxy = new api.proxies.InstrumentProxyService();
+    const instrumentProxy = new api.proxies.InstrumentProxyService();
     try {
-        let result = await instrumentProxy.getInstruments(title);
+        const result = await instrumentProxy.getInstruments(title);
         res.json(result.body);
     } catch (err) {
         res.statusCode = 502; // bad gateway

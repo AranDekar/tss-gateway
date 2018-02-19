@@ -73,6 +73,6 @@
     "start": "node app.js",
     "test": "swagger project test",
     "swagger": "swagger project start",
-    "debug": "nodemon --inspect=5656 app.js"
+    "debug": "nodemon --inspect=0.0.0.0:5656 app.js"
   }
 }

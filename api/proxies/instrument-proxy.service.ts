@@ -8,25 +8,24 @@ export class InstrumentProxyService extends proxies.ProxyBaseService {
     constructor() {
         super(api.helpers.Config.settings.instruments_base_path);
     }
-    /**
-    *
+    /*
     * Returns a list of instruments or a single one if provided the title
     * @param title The title of a specific instrument
     */
-    public getInstruments(title?: string): Promise<{ response: http.ClientResponse; body: api.interfaces.Instrument[]; }> {
+    public getInstruments(title?: string):
+        Promise<{ response: http.ClientResponse; body: api.interfaces.Instrument[]; }> {
         const localVarPath = this.basePath;
-        let queryParameters: any = {};
-        let headerParams: any = this.extendObj({}, this.defaultHeaders);
-        let formParams: any = {};
-
+        const queryParameters: any = {};
+        const headerParams: any = this.extendObj({}, this.defaultHeaders);
+        const formParams: any = {};
 
         if (title !== undefined) {
-            queryParameters['title'] = title;
+            queryParameters.title = title;
         }
 
-        let useFormData = false;
+        const useFormData = false;
 
-        let requestOptions: request.Options = {
+        const requestOptions: request.Options = {
             method: 'GET',
             qs: queryParameters,
             headers: headerParams,
@@ -41,7 +40,7 @@ export class InstrumentProxyService extends proxies.ProxyBaseService {
 
         if (Object.keys(formParams).length) {
             if (useFormData) {
-                (<any>requestOptions).formData = formParams;
+                (requestOptions as any).formData = formParams;
             } else {
                 requestOptions.form = formParams;
             }
@@ -52,9 +51,9 @@ export class InstrumentProxyService extends proxies.ProxyBaseService {
                     reject(error);
                 } else {
                     if (response.statusCode && (response.statusCode >= 200 && response.statusCode <= 299)) {
-                        resolve({ response: response, body: body });
+                        resolve({ response, body });
                     } else {
-                        reject({ response: response, body: body });
+                        reject({ response, body });
                     }
                 }
             });

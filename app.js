@@ -9,7 +9,7 @@ const cors = require('cors');
 const app = require('express')();
 const jwtService = new api.helpers.JwtTokenService();
 module.exports = app; // for testing
-const port = process.env.PORT || 10000;
+const port = process.env.PORT || 10020;
 api.helpers.Google.use();
 app.use(passport.initialize());
 app.use(cookieParser());
