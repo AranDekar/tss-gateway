@@ -1,8 +1,8 @@
 {
-  "name": "tforex-gateway",
+  "name": "tss-gateway",
   "version": "0.0.1",
   "private": true,
-  "description": "gateway for tforex microservices",
+  "description": "gateway for tss microservices",
   "keywords": [],
   "author": "",
   "license": "",

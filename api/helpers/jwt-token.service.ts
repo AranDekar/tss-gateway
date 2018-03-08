@@ -1,7 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 import * as uuid from 'uuid';
 
-
 import * as api from '../../api';
 import * as helpers from '../helpers';
 
@@ -11,7 +10,7 @@ export class JwtTokenService {
             throw new Error('user is not defined to sign the jwt token');
         }
 
-        let userInPayload = {
+        const userInPayload = {
             id: user.id,
             firstName: user.firstName,
             lastName: user.lastName,
@@ -20,21 +19,21 @@ export class JwtTokenService {
             created: user.created,
             updated: user.updated,
         };
-        let xsrfToken = uuid.v1();
+        const xsrfToken = uuid.v1();
 
-        let payload = {
-            xsrfToken: xsrfToken,
+        const payload = {
+            xsrfToken,
             user: userInPayload,
         };
-        let options: jwt.SignOptions = {
+        const options: jwt.SignOptions = {
             expiresIn: helpers.Config.settings.expiration_jwt_minutes * 60,
-            issuer: 'tforex-gateway',
+            issuer: 'tss-gateway',
             jwtid: 'uniqueId',
             subject: user.id.toString(),
         };
-        let token = jwt.sign(payload, helpers.Config.settings.jwt_secret, options);
+        const token = jwt.sign(payload, helpers.Config.settings.jwt_secret, options);
 
-        let result: JwtTokenServiceData = {
+        const result: JwtTokenServiceData = {
             jwt: token,
             xsrf: xsrfToken,
         };
@@ -42,9 +41,9 @@ export class JwtTokenService {
         return result;
     }
     public verifyToken(token: string, next: (err: Error, payload: any) => void) {
-        let options: jwt.SignOptions = {
+        const options: jwt.SignOptions = {
             expiresIn: api.helpers.Config.settings.expiration_jwt_minutes * 60,
-            issuer: 'tforex-gateway',
+            issuer: 'tss-gateway',
             jwtid: 'uniqueId',
         };
         jwt.verify(token, api.helpers.Config.settings.jwt_secret, options, next);

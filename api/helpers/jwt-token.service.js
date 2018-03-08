@@ -9,7 +9,7 @@ class JwtTokenService {
         if (!user || !user.id) {
             throw new Error('user is not defined to sign the jwt token');
         }
-        let userInPayload = {
+        const userInPayload = {
             id: user.id,
             firstName: user.firstName,
             lastName: user.lastName,
@@ -18,28 +18,28 @@ class JwtTokenService {
             created: user.created,
             updated: user.updated,
         };
-        let xsrfToken = uuid.v1();
-        let payload = {
-            xsrfToken: xsrfToken,
+        const xsrfToken = uuid.v1();
+        const payload = {
+            xsrfToken,
             user: userInPayload,
         };
-        let options = {
+        const options = {
             expiresIn: helpers.Config.settings.expiration_jwt_minutes * 60,
-            issuer: 'tforex-gateway',
+            issuer: 'tss-gateway',
             jwtid: 'uniqueId',
             subject: user.id.toString(),
         };
-        let token = jwt.sign(payload, helpers.Config.settings.jwt_secret, options);
-        let result = {
+        const token = jwt.sign(payload, helpers.Config.settings.jwt_secret, options);
+        const result = {
             jwt: token,
             xsrf: xsrfToken,
         };
         return result;
     }
     verifyToken(token, next) {
-        let options = {
+        const options = {
             expiresIn: api.helpers.Config.settings.expiration_jwt_minutes * 60,
-            issuer: 'tforex-gateway',
+            issuer: 'tss-gateway',
             jwtid: 'uniqueId',
         };
         jwt.verify(token, api.helpers.Config.settings.jwt_secret, options, next);

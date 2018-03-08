@@ -26,7 +26,7 @@ class Config {
                 jwt_secret: 'secret',
                 google: googleConfig,
                 apiKeys,
-                mongo_db_connection_string: process.env.MONGO || `mongodb://mongodb/tforex`,
+                mongo_db_connection_string: process.env.MONGO || `mongodb://mongodb/tss`,
                 kafka_conn_string: process.env.KAFKA || 'kafka:9092',
             };
         }
