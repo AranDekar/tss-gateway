@@ -1,12 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const validator = require("validator");
@@ -84,26 +76,24 @@ schema.methods.hashPassword = function (password) {
 schema.methods.authenticate = function (password) {
     return this.password === this.hashPassword(password);
 };
-schema.statics.findUniqueUsername = function (username, suffix) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let _this = this;
-        let possibleUsername = username.toLowerCase() + (suffix || '');
-        try {
-            let user = yield _this.findOne({ username: possibleUsername }).exec();
-            if (!user) {
-                Promise.resolve(possibleUsername);
-            }
-            else {
-                return yield _this.findUniqueUsername(username, (suffix || 0) + 1);
-            }
+schema.statics.findUniqueUsername = async function (username, suffix) {
+    let _this = this;
+    let possibleUsername = username.toLowerCase() + (suffix || '');
+    try {
+        let user = await _this.findOne({ username: possibleUsername }).exec();
+        if (!user) {
+            Promise.resolve(possibleUsername);
         }
-        catch (err) {
-            Promise.reject(err);
+        else {
+            return await _this.findUniqueUsername(username, (suffix || 0) + 1);
         }
-    });
+    }
+    catch (err) {
+        Promise.reject(err);
+    }
 };
-schema.statics.findByEmailAddress = (emailAddress) => __awaiter(this, void 0, void 0, function* () {
+schema.statics.findByEmailAddress = async (emailAddress) => {
     return this.userModel.findOne({ email: emailAddress }).exec();
-});
+};
 exports.userModel = mongoose.model('user', schema);
 //# sourceMappingURL=user.model.js.map

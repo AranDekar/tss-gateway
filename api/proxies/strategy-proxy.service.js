@@ -1,12 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const request = require("request");
 const api = require("../../api");
@@ -15,94 +7,90 @@ class StrategyProxyService extends proxies.ProxyBaseService {
     constructor() {
         super(api.helpers.Config.settings.strategies_base_path);
     }
-    get(id = null) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const localVarPath = this.basePath;
-            let queryParameters = {};
-            let headerParams = this.extendObj({}, this.defaultHeaders);
-            let formParams = {};
-            if (id !== undefined) {
-                queryParameters['_id'] = id;
+    async get(id = null) {
+        const localVarPath = this.basePath;
+        let queryParameters = {};
+        let headerParams = this.extendObj({}, this.defaultHeaders);
+        let formParams = {};
+        if (id !== undefined) {
+            queryParameters['_id'] = id;
+        }
+        let useFormData = false;
+        let requestOptions = {
+            method: 'GET',
+            qs: queryParameters,
+            headers: headerParams,
+            uri: localVarPath,
+            useQuerystring: this._useQuerystring,
+            json: true,
+        };
+        this.authentications.api_key.applyToRequest(requestOptions);
+        this.authentications.default.applyToRequest(requestOptions);
+        if (Object.keys(formParams).length) {
+            if (useFormData) {
+                requestOptions.formData = formParams;
             }
-            let useFormData = false;
-            let requestOptions = {
-                method: 'GET',
-                qs: queryParameters,
-                headers: headerParams,
-                uri: localVarPath,
-                useQuerystring: this._useQuerystring,
-                json: true,
-            };
-            this.authentications.api_key.applyToRequest(requestOptions);
-            this.authentications.default.applyToRequest(requestOptions);
-            if (Object.keys(formParams).length) {
-                if (useFormData) {
-                    requestOptions.formData = formParams;
+            else {
+                requestOptions.form = formParams;
+            }
+        }
+        return new Promise((resolve, reject) => {
+            request(requestOptions, (error, response, body) => {
+                if (error) {
+                    reject(error);
                 }
                 else {
-                    requestOptions.form = formParams;
-                }
-            }
-            return new Promise((resolve, reject) => {
-                request(requestOptions, (error, response, body) => {
-                    if (error) {
-                        reject(error);
+                    if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
+                        resolve({ response: response, body: body });
                     }
                     else {
-                        if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            resolve({ response: response, body: body });
-                        }
-                        else {
-                            reject({ response: response, body: body });
-                        }
+                        reject({ response: response, body: body });
                     }
-                });
+                }
             });
         });
     }
-    create(strategy) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const localVarPath = this.basePath + '/strategies';
-            let queryParameters = {};
-            let headerParams = this.extendObj({}, this.defaultHeaders);
-            let formParams = {};
-            // verify required parameter 'strategy' is not null or undefined
-            if (strategy === null || strategy === undefined) {
-                throw new Error('Required parameter strategy was null or undefined when calling post.');
+    async create(strategy) {
+        const localVarPath = this.basePath + '/strategies';
+        let queryParameters = {};
+        let headerParams = this.extendObj({}, this.defaultHeaders);
+        let formParams = {};
+        // verify required parameter 'strategy' is not null or undefined
+        if (strategy === null || strategy === undefined) {
+            throw new Error('Required parameter strategy was null or undefined when calling post.');
+        }
+        let useFormData = false;
+        let requestOptions = {
+            method: 'POST',
+            qs: queryParameters,
+            headers: headerParams,
+            uri: localVarPath,
+            useQuerystring: this._useQuerystring,
+            json: true,
+            body: strategy,
+        };
+        this.authentications.default.applyToRequest(requestOptions);
+        if (Object.keys(formParams).length) {
+            if (useFormData) {
+                requestOptions.formData = formParams;
             }
-            let useFormData = false;
-            let requestOptions = {
-                method: 'POST',
-                qs: queryParameters,
-                headers: headerParams,
-                uri: localVarPath,
-                useQuerystring: this._useQuerystring,
-                json: true,
-                body: strategy,
-            };
-            this.authentications.default.applyToRequest(requestOptions);
-            if (Object.keys(formParams).length) {
-                if (useFormData) {
-                    requestOptions.formData = formParams;
+            else {
+                requestOptions.form = formParams;
+            }
+        }
+        return new Promise((resolve, reject) => {
+            request(requestOptions, (error, response, body) => {
+                if (error) {
+                    reject(error);
                 }
                 else {
-                    requestOptions.form = formParams;
-                }
-            }
-            return new Promise((resolve, reject) => {
-                request(requestOptions, (error, response, body) => {
-                    if (error) {
-                        reject(error);
+                    if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
+                        resolve({ response: response, body: body });
                     }
                     else {
-                        if (response.statusCode && response.statusCode >= 200 && response.statusCode <= 299) {
-                            resolve({ response: response, body: body });
-                        }
-                        else {
-                            reject({ response: response, body: body });
-                        }
+                        reject({ response: response, body: body });
                     }
-                });
+                }
             });
         });
     }
